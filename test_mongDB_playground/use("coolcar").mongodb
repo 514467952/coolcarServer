@@ -1,0 +1,85 @@
+use("coolcar")
+db.account.drop()
+
+//往表里插入数据
+use("coolcar")
+db.account.insertMany([
+  {open_id: "123"},
+  {open_id: "456"}
+])
+
+//查找
+use("coolcar")
+db.account.find({
+  open_id: "123"
+})
+
+//更新，如果没有就插入
+use("coolcar")
+db.account.updateOne({
+  open_id: "789"
+},{
+  $set:{
+    open_id: "789"
+  }
+},{
+  //新增一条记录
+  upsert: true
+})
+
+//查找记录并且返回记录id
+use("coolcar")
+db.account.findAndModify({
+  query: {
+    open_id: "789"
+  },
+  update: {
+    $set: { open_id: "789" }
+  },
+  upsert: true
+})
+
+
+//upsert表示如果没有就添加
+//findAndModify如果查找一个没有的记录，添加上upsert会自动添加查找的记录
+//但是返回的结果是null。因为find是更新前的数据，所以需要添加new参数去查找更新后的数据
+use("coolcar")
+db.account.findAndModify({
+  query: {
+    open_id: "def"
+  },
+  update: {
+    $set: { open_id: "def" }
+  },
+  upsert: true,
+  new: true,
+})
+
+use("coolcar")
+function resolveOpenID(open_id) {
+  return db.account.findAndModify({
+    query: {
+      open_id: open_id
+    },
+    update: {
+      $set: { open_id: open_id }
+    },
+    upsert: true,
+    new: true,
+  })
+}
+resolveOpenID("def")
+
+//解决两个人同时添加相等open_id，插入两条记录
+//建立索引
+use("coolcar")
+db.account.createIndex({
+  open_id: 1
+},{
+  unique: true
+})
+
+
+
+use("coolcar")
+db.account.find()
