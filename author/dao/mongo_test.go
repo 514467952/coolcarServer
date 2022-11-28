@@ -14,11 +14,12 @@ func TestResolveAccountID(t *testing.T) {
 	if err != nil {
 		t.Fatalf("cannot connect mongodb:%v", err)
 	}
+	//链接coolcar数据库
 	m := NewMongo(mc.Database("coolcar"))
 	//调用获取accountID的函数，传入open_id为123
 	id, err := m.ResolveAccountID(c, "123")
 	if err != nil {
-		t.Errorf("faild resolve account id for 123:%v", err)
+		t.Errorf("faild resolve account id for 123:%v", err) 
 	} else {
 		//得到的值不对，要报错
 		//%q是在输出的字符串两边加上""
