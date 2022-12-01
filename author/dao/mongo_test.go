@@ -6,6 +6,7 @@ import (
 	"os"
 	"testing"
 
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -21,6 +22,12 @@ func TestResolveAccountID(t *testing.T) {
 	}
 	//链接coolcar数据库
 	m := NewMongo(mc.Database("coolcar"))
+
+	m.newObjID = func() primitive.ObjectID {
+		objID, _ := primitive.ObjectIDFromHex("63846097e8f95ffe0d631335")
+		return objID
+	}
+
 	//调用获取accountID的函数，传入open_id为123
 	id, err := m.ResolveAccountID(c, "123")
 	if err != nil {
