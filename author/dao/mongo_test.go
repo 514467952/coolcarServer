@@ -2,15 +2,20 @@ package dao
 
 import (
 	"context"
+	mongotesting "coolcar/shared/testing"
+	"os"
 	"testing"
 
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
+//docker启动的mongoDB的端口
+var mongoURI string
+
 func TestResolveAccountID(t *testing.T) {
 	c := context.Background()
-	mc, err := mongo.Connect(c, options.Client().ApplyURI("mongodb://106.54.49.241:27017/?readPreference=primary&ssl=false&directConnection=true"))
+	mc, err := mongo.Connect(c, options.Client().ApplyURI(mongoURI))
 	if err != nil {
 		t.Fatalf("cannot connect mongodb:%v", err)
 	}
@@ -28,4 +33,8 @@ func TestResolveAccountID(t *testing.T) {
 			t.Errorf("resolve account id: want:%q,got:%q", want, id)
 		}
 	}
+}
+
+func TestMain(m *testing.M) {
+	os.Exit(mongotesting.RunWithMongoInDocker(m, &mongoURI))
 }
