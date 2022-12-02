@@ -51,8 +51,8 @@ func RunWithMongoInDocker(m *testing.M, mongoURI *string) int {
 		err := c.ContainerRemove(ctx, containerID, types.ContainerRemoveOptions{
 			Force: true,
 		})
-		fmt.Printf("销毁容器失败:error removing container:%v", err)
 		if err != nil {
+			fmt.Printf("销毁容器失败:error removing container:%v", err)
 			panic(err)
 		}
 	}()
