@@ -3,6 +3,7 @@ package main
 import (
 	rentalpb "coolcar/rental/api/gen/v1/rental"
 	"coolcar/rental/trip"
+	sharedauth "coolcar/shared/auth"
 	"log"
 	"net"
 
@@ -22,8 +23,13 @@ func main() {
 		logger.Fatal("cannot listen", zap.Error(err))
 	}
 
+	in, err := sharedauth.Interceptor("shared/auth/public.key")
+	if err != nil {
+		logger.Fatal("cannot create auth interceptor", zap.Error(err))
+	}
+
 	//创建一个rpc服务对象
-	s := grpc.NewServer()
+	s := grpc.NewServer(grpc.UnaryInterceptor(in))
 	//注册rental服务
 	rentalpb.RegisterTripServiceServer(s, &trip.Service{
 		Logger: logger,
