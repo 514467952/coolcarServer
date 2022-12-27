@@ -7,9 +7,9 @@ import (
 	"coolcar/author/dao"
 	token "coolcar/author/token"
 	"coolcar/author/wechat"
+	"coolcar/shared/sharedserver"
 	"io/ioutil"
 	"log"
-	"net"
 	"os"
 	"time"
 
@@ -22,14 +22,9 @@ import (
 
 func main() {
 	//创建日志对象
-	logger, err := newZapLogger()
+	logger, err := sharedserver.NewZapLogger()
 	if err != nil {
 		log.Fatalf("cannot create logger:%v", err)
-	}
-
-	lis, err := net.Listen("tcp", ":8081")
-	if err != nil {
-		logger.Fatal("cannot listen", zap.Error(err))
 	}
 
 	//建立与mongoDB数据库的链接
@@ -53,28 +48,23 @@ func main() {
 		logger.Fatal("cannot parse private key", zap.Error(err))
 	}
 
-	//创建一个rpc服务对象
-	s := grpc.NewServer()
-
-	//authpb注册auth服务
-	authpb.RegisterAuthServiceServer(s, &auth.Service{
-		OpenIDResolver: &wechat.Service{
-			AppID:     "wx2e157f9c5eef2403",
-			AppSecret: "b9db8bdde1b98a0e1749b936c3549c43",
+	err = sharedserver.RunGRPCServer(&sharedserver.GRPCConfig{
+		Name:   "auth",
+		Addr:   ":8081",
+		Logger: logger,
+		RegisterFunc: func(s *grpc.Server) {
+			authpb.RegisterAuthServiceServer(s, &auth.Service{
+				OpenIDResolver: &wechat.Service{
+					AppID:     "wx2e157f9c5eef2403",
+					AppSecret: "b9db8bdde1b98a0e1749b936c3549c43",
+				},
+				MyMongo:        dao.NewMongo(mongoClient.Database("coolcar")),
+				Logger:         logger,
+				TokenExpire:    2 * time.Hour,
+				TokenGenerator: token.NewJWTTokenGen("coolcar/auth", privateKey),
+			})
 		},
-		MyMongo:        dao.NewMongo(mongoClient.Database("coolcar")),
-		Logger:         logger,
-		TokenExpire:    2 * time.Hour,
-		TokenGenerator: token.NewJWTTokenGen("coolcar/auth", privateKey),
 	})
 
-	s.Serve(lis)
-	logger.Fatal("cannot server", zap.Error(err))
-}
-
-//自定义日志
-func newZapLogger() (*zap.Logger, error) {
-	cfg := zap.NewDevelopmentConfig()
-	cfg.EncoderConfig.TimeKey = ""
-	return cfg.Build()
+	logger.Fatal("cannot start auth server", zap.Error(err))
 }

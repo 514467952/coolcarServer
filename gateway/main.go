@@ -8,6 +8,7 @@ import (
 	"context"
 	authpb "coolcar/author/api/gen/v1/author"
 	rentalpb "coolcar/rental/api/gen/v1/rental"
+	"coolcar/shared/sharedserver"
 	"log"
 	"net/http"
 
@@ -17,6 +18,12 @@ import (
 )
 
 func main() {
+
+	lg, err := sharedserver.NewZapLogger()
+	if err != nil {
+		log.Fatal("cannot create zap logger: %v", err)
+	}
+
 	c := context.Background()
 	c, cancel := context.WithCancel(c)
 	defer cancel()
@@ -30,22 +37,33 @@ func main() {
 		},
 	))
 
-	//监听8081的auth服务
-	err := authpb.RegisterAuthServiceHandlerFromEndpoint(
-		c, mux, "localhost:8081",
-		[]grpc.DialOption{grpc.WithInsecure()},
-	)
-	if err != nil {
-		log.Fatalf("cannnot register auth service,%v", err)
+	serverConfig := []struct {
+		name         string
+		addr         string
+		registerFunc func(ctx context.Context, mux *runtime.ServeMux, endpoint string, opts []grpc.DialOption) (err error)
+	}{
+		{
+			name:         "auth",
+			addr:         "localhost:8081",
+			registerFunc: authpb.RegisterAuthServiceHandlerFromEndpoint,
+		},
+		{
+			name:         "rental",
+			addr:         "localhost:8082",
+			registerFunc: rentalpb.RegisterTripServiceHandlerFromEndpoint,
+		},
 	}
 
-	//注册8082端口的rental服务
-	err = rentalpb.RegisterTripServiceHandlerFromEndpoint(
-		c, mux, "localhost:8082",
-		[]grpc.DialOption{grpc.WithInsecure()},
-	)
-	if err != nil {
-		log.Fatalf("cannnot register rental service,%v", err)
+	for _, s := range serverConfig {
+		err := s.registerFunc(
+			c, mux, s.addr,
+			[]grpc.DialOption{grpc.WithInsecure()},
+		)
+		if err != nil {
+			lg.Sugar().Fatalf("cannnot register service%s,%v", s.name, err)
+		}
 	}
-	log.Fatal(http.ListenAndServe(":8080", mux))
+	addr := ":8080"
+	lg.Sugar().Infof("grpc gateway started at %s", addr)
+	lg.Sugar().Fatal(http.ListenAndServe(":8080", mux))
 }
