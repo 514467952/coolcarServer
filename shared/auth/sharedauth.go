@@ -70,7 +70,7 @@ func (i *interceptor) HandlerReq(ctx context.Context, req interface{}, info *grp
 	if err != nil {
 		return nil, status.Errorf(codes.Unauthenticated, "token不合法:%v", err)
 	}
-	return handler(ContextWithAccountID(ctx, aid), req)
+	return handler(ContextWithAccountID(ctx, AccountID(aid)), req)
 }
 
 func tokenFromContext(c context.Context) (string, error) {
@@ -95,13 +95,20 @@ func tokenFromContext(c context.Context) (string, error) {
 
 type accountIDKey struct{}
 
-func ContextWithAccountID(c context.Context, aid string) context.Context {
+//限定AccountID为string类型，
+type AccountID string
+
+func (a AccountID) String() string {
+	return string(a)
+}
+
+func ContextWithAccountID(c context.Context, aid AccountID) context.Context {
 	return context.WithValue(c, accountIDKey{}, aid)
 }
 
-func AccountIDFromContext(c context.Context) (string, error) {
+func AccountIDFromContext(c context.Context) (AccountID, error) {
 	v := c.Value(accountIDKey{})
-	aid, ok := v.(string)
+	aid, ok := v.(AccountID)
 	if !ok {
 		return "", status.Error(codes.Unauthenticated, "AccountIDFromContext error")
 	}
