@@ -2,14 +2,70 @@ syntax = "proto3";
 package rental.v1;
 option go_package="coolcar/rental/api/gen/v1;rentalpb";
 
-message CreateTripRequest {
-    string start = 1;
+//定义点的位置
+message Loaction {
+    double latitude = 1; //纬度
+    double longitude = 2; //经度
 }
 
-message CreateTripResponse {
+//定义点的状态
+message LocationStatus {
+    Loaction Loaction = 1; //点的位置
+    int32 fee_cent = 2;  //点的费用
+    double km_driven = 3; //公里数
+    string poi_name = 4; //行程的描述
+}
 
+enum TripStatus {
+    TS_NOT_SPECIFIED = 0;  //无规定
+    IN_PROGRESS = 1; //在行程中
+    FINISHED = 2; //行程结束
+}
+
+//行程的对象
+message TripEntity {
+    string id = 1;
+    Trip trip = 2;
+}
+
+//行程的数据
+message Trip {
+    string accountID = 1; //开车的人
+    string carID = 2;//开的哪辆车
+    LocationStatus start = 3; //起点
+    LocationStatus current = 4; //当前点
+    LocationStatus end = 5; //结束点
+    TripStatus status = 6; //行程的状态
+}
+
+
+message CreateTripRequest {
+    Loaction start = 1;
+    string car_id = 2;
+}
+
+
+message GetTripRequest {
+    string id = 1; //根据id获取行程的信息
+}
+
+message GetTripsRequest {
+    TripStatus status = 1; //根据行程的状态查找
+}
+
+message GetTripsResponse {
+    repeated TripEntity trips = 1;
+}
+
+message UpdateTripRequest {
+    string id = 1; //行程id
+    Loaction current = 2; //当前行程的位置
+    bool end_trip = 3; //是否结束行程
 }
 
 service TripService {
-    rpc CreateTrip (CreateTripRequest) returns (CreateTripResponse);
+    rpc CreateTrip (CreateTripRequest) returns (TripEntity);
+    rpc GetTrip (GetTripRequest) returns (Trip);
+    rpc GetTrips (GetTripsRequest) returns (GetTripsResponse);
+    rpc UpdateTrip (UpdateTripRequest) returns (Trip);
 }
