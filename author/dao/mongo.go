@@ -2,11 +2,10 @@ package dao
 
 import (
 	"context"
-	sharemgo "coolcar/shared/mongo"
+	mgutil "coolcar/shared/mongo"
 	"fmt"
 
 	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -15,8 +14,7 @@ const openIDField = "open_id"
 
 type MyMongo struct {
 	//变量名小写，外面看不到
-	col      *mongo.Collection
-	newObjID func() primitive.ObjectID
+	col *mongo.Collection
 }
 
 //这个文件只知道操纵的是数据库的account表
@@ -26,8 +24,7 @@ type MyMongo struct {
 //newObjID是一个函数，由外部给到，生出一个固定的id
 func NewMongo(db *mongo.Database) *MyMongo {
 	return &MyMongo{
-		col:      db.Collection("account"),
-		newObjID: primitive.NewObjectID,
+		col: db.Collection("account"),
 	}
 }
 
@@ -35,14 +32,14 @@ func NewMongo(db *mongo.Database) *MyMongo {
 func (m *MyMongo) ResolveAccountID(c context.Context, openID string) (string, error) {
 
 	//生成一个固定ID
-	insertedID := m.newObjID()
+	insertedID := mgutil.NewObjID()
 	//先去查找记录，如果找到直接返回
 	//找不到，插入一条固定ID：openID的记录
 	res := m.col.FindOneAndUpdate(c, bson.M{
 		openIDField: openID,
-	}, sharemgo.SetOnInsert(bson.M{
-		sharemgo.IDField: insertedID,
-		openIDField:      openID,
+	}, mgutil.SetOnInsert(bson.M{
+		mgutil.IDFieldName: insertedID,
+		openIDField:        openID,
 	}), options.FindOneAndUpdate().
 		SetUpsert(true).
 		SetReturnDocument(options.After))
@@ -51,7 +48,7 @@ func (m *MyMongo) ResolveAccountID(c context.Context, openID string) (string, er
 		return "", fmt.Errorf("cannot findOneAndUpdate:%v", err)
 	}
 
-	var row sharemgo.ObjectID
+	var row mgutil.IDField
 
 	err := res.Decode(&row)
 	if err != nil {

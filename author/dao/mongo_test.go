@@ -2,7 +2,7 @@ package dao
 
 import (
 	"context"
-	sharemgo "coolcar/shared/mongo"
+	mgutil "coolcar/shared/mongo"
 	mongotesting "coolcar/shared/testing"
 	"fmt"
 	"os"
@@ -29,16 +29,16 @@ func TestResolveAccountID(t *testing.T) {
 	//固定id测试，插入几条测试case
 	_, err = m.col.InsertMany(c, []interface{}{
 		bson.M{
-			sharemgo.IDField: mustObjID("63846097e8f95ffe0d631335"),
-			openIDField:      "openid_1",
+			mgutil.IDFieldName: mustObjID("63846097e8f95ffe0d631335"),
+			openIDField:        "openid_1",
 		},
 		bson.M{
-			sharemgo.IDField: mustObjID("63846097e8f95ffe0d631337"),
-			openIDField:      "openid_2",
+			mgutil.IDFieldName: mustObjID("63846097e8f95ffe0d631337"),
+			openIDField:        "openid_2",
 		},
 		bson.M{
-			sharemgo.IDField: mustObjID("63846097e8f95ffe0d631336"),
-			openIDField:      "openid_3",
+			mgutil.IDFieldName: mustObjID("63846097e8f95ffe0d631336"),
+			openIDField:        "openid_3",
 		},
 	})
 
@@ -46,7 +46,7 @@ func TestResolveAccountID(t *testing.T) {
 		t.Fatalf("cannot insert many inital values: %v", err)
 	}
 
-	// m.newObjID = func() primitive.ObjectID {
+	// mgutil.NewObjID = func() primitive.ObjectID {
 	// 	return mustObjID("63846097e8f95ffe0d63133502")
 	// }
 
