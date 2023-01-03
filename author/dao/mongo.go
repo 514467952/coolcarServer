@@ -2,7 +2,9 @@ package dao
 
 import (
 	"context"
+	"coolcar/shared/id"
 	mgutil "coolcar/shared/mongo"
+	"coolcar/shared/mongo/objid"
 	"fmt"
 
 	"go.mongodb.org/mongo-driver/bson"
@@ -29,7 +31,7 @@ func NewMongo(db *mongo.Database) *MyMongo {
 }
 
 //收到openID，返回对应的记录ID
-func (m *MyMongo) ResolveAccountID(c context.Context, openID string) (string, error) {
+func (m *MyMongo) ResolveAccountID(c context.Context, openID string) (id.AccountID, error) {
 
 	//生成一个固定ID
 	insertedID := mgutil.NewObjID()
@@ -55,5 +57,5 @@ func (m *MyMongo) ResolveAccountID(c context.Context, openID string) (string, er
 		return "", fmt.Errorf("cannot decode result:%v", err)
 	}
 
-	return row.ID.Hex(), nil
+	return objid.ToAccountID(row.ID), nil
 }
