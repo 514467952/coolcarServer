@@ -2,14 +2,14 @@ package dao
 
 import (
 	"context"
+	"coolcar/shared/id"
 	mgutil "coolcar/shared/mongo"
+	"coolcar/shared/mongo/objid"
 	mongotesting "coolcar/shared/testing"
-	"fmt"
 	"os"
 	"testing"
 
 	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -29,15 +29,15 @@ func TestResolveAccountID(t *testing.T) {
 	//固定id测试，插入几条测试case
 	_, err = m.col.InsertMany(c, []interface{}{
 		bson.M{
-			mgutil.IDFieldName: mustObjID("63846097e8f95ffe0d631335"),
+			mgutil.IDFieldName: objid.MustFromID(id.AccountID("63846097e8f95ffe0d631335")),
 			openIDField:        "openid_1",
 		},
 		bson.M{
-			mgutil.IDFieldName: mustObjID("63846097e8f95ffe0d631337"),
+			mgutil.IDFieldName: objid.MustFromID(id.AccountID("63846097e8f95ffe0d631337")),
 			openIDField:        "openid_2",
 		},
 		bson.M{
-			mgutil.IDFieldName: mustObjID("63846097e8f95ffe0d631336"),
+			mgutil.IDFieldName: objid.MustFromID(id.AccountID("63846097e8f95ffe0d631336")),
 			openIDField:        "openid_3",
 		},
 	})
@@ -80,7 +80,7 @@ func TestResolveAccountID(t *testing.T) {
 			if err != nil {
 				t.Errorf("faild resolve account id for %q:%v", cc.openID, err)
 			}
-			if id != cc.want {
+			if id.String() != cc.want {
 				t.Errorf("resolve account id: want:%q,got:%q", cc.want, id)
 			}
 		})
@@ -89,12 +89,4 @@ func TestResolveAccountID(t *testing.T) {
 
 func TestMain(m *testing.M) {
 	os.Exit(mongotesting.RunWithMongoInDocker(m, &mongoURI))
-}
-
-func mustObjID(hex string) primitive.ObjectID {
-	objID, err := primitive.ObjectIDFromHex(hex)
-	if err != nil {
-		fmt.Printf("mustObjID error:%v", err)
-	}
-	return objID
 }

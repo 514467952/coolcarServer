@@ -3,6 +3,8 @@ package dao
 import (
 	"context"
 	rentalpb "coolcar/rental/api/gen/v1/rental"
+	"coolcar/shared/id"
+	"coolcar/shared/mongo/objid"
 	mongotesting "coolcar/shared/testing"
 	"os"
 	"testing"
@@ -22,9 +24,9 @@ func TestCreateTrip(t *testing.T) {
 	}
 	//链接coolcar数据库
 	m := NewMongo(mc.Database("coolcar"))
-
+	acct := id.AccountID("account1")
 	tr, err := m.CreateTrip(c, &rentalpb.Trip{
-		AccountID: "account1",
+		AccountID: acct.String(),
 		CarID:     "car1",
 		Start: &rentalpb.LocationStatus{
 			PoiName: "startpoint",
@@ -48,6 +50,12 @@ func TestCreateTrip(t *testing.T) {
 		t.Errorf("cannot create trip:%v", err)
 	}
 	t.Errorf("inserted row %s with updatedat %v", tr.ID, tr.UpdateAt)
+
+	got, err := m.GetTrip(c, objid.ToTripID(tr.ID), acct)
+	if err != nil {
+		t.Errorf("cannot get trip:%v", err)
+	}
+	t.Errorf("got trip:%+v", got)
 }
 
 func TestMain(m *testing.M) {
