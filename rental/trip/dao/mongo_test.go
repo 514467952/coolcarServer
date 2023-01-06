@@ -9,22 +9,22 @@ import (
 	"os"
 	"testing"
 
-	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
+	"github.com/google/go-cmp/cmp"
+	"google.golang.org/protobuf/testing/protocmp"
 )
 
 //docker启动的mongoDB的端口
-var mongoURI string
+// var mongoURI string
 
-func TestCreateTrip(t *testing.T) {
+func TestGetTrip(t *testing.T) {
 	c := context.Background()
-	mc, err := mongo.Connect(c, options.Client().ApplyURI(mongoURI))
+	mc, err := mongotesting.NewClient(c)
 	if err != nil {
 		t.Fatalf("cannot connect mongodb:%v", err)
 	}
 	//链接coolcar数据库
 	m := NewMongo(mc.Database("coolcar"))
-	acct := id.AccountID("account1")
+	acct := id.AccountID("account2")
 	tr, err := m.CreateTrip(c, &rentalpb.Trip{
 		AccountID: acct.String(),
 		CarID:     "car1",
@@ -44,20 +44,22 @@ func TestCreateTrip(t *testing.T) {
 				Longitude: 115,
 			},
 		},
-		Status: rentalpb.TripStatus_FINISHED,
+		Status: rentalpb.TripStatus_IN_PROGRESS,
 	})
 	if err != nil {
 		t.Errorf("cannot create trip:%v", err)
 	}
-	t.Errorf("inserted row %s with updatedat %v", tr.ID, tr.UpdateAt)
 
 	got, err := m.GetTrip(c, objid.ToTripID(tr.ID), acct)
 	if err != nil {
-		t.Errorf("cannot get trip:%v", err)
+		t.Fatalf("cannot get trip:%v", err)
 	}
-	t.Errorf("got trip:%+v", got)
+
+	if diff := cmp.Diff(tr, got, protocmp.Transform()); diff != "" {
+		t.Errorf("result differs:-want +got: %s", diff)
+	}
 }
 
 func TestMain(m *testing.M) {
-	os.Exit(mongotesting.RunWithMongoInDocker(m, &mongoURI))
+	os.Exit(mongotesting.RunWithMongoInDocker(m))
 }
