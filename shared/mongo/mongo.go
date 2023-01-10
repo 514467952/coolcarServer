@@ -1,6 +1,8 @@
 package mgutil
 
 import (
+	"coolcar/shared/mongo/objid"
+	"fmt"
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
@@ -30,6 +32,12 @@ type UpdateAtField struct {
 //NewObjID每次获取都是不确定的，所以统一处理获取逻辑
 //外部可以通过修改该这个变量，固定该值去执行单测
 var NewObjID = primitive.NewObjectID
+
+func NewObjectIDWithValue(id fmt.Stringer) {
+	NewObjID = func() primitive.ObjectID {
+		return objid.MustFromID(id)
+	}
+}
 
 //UpdateAt是时间，也是不固定的，统一处理
 //外部可以改成固定的，方便单测
