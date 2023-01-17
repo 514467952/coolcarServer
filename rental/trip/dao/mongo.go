@@ -42,9 +42,9 @@ type TripRecord struct {
 	Trip                 *rentalpb.Trip `bson:"trip"`
 }
 
-//TODO:同一个account最多只能有一个进行中的Trip
-//TODO:强类型化Tripid
-//TODO:表格驱动测试
+//同一个account最多只能有一个进行中的Trip
+//强类型化Tripid
+//表格驱动测试
 
 func (m *Mongo) CreateTrip(c context.Context, trip *rentalpb.Trip) (*TripRecord, error) {
 	r := &TripRecord{
@@ -84,14 +84,18 @@ func (m *Mongo) GetTrip(c context.Context, id id.TripID, accountID id.AccountID)
 
 //批量获取行程
 func (m *Mongo) GetTrips(c context.Context, accountID id.AccountID, status rentalpb.TripStatus) ([]*TripRecord, error) {
+	//通过accountID用户的全部行程
 	filter := bson.M{
 		accountIDField: accountID.String(),
 	}
 
+	//如果外部给了status，再加上行程的状态
 	if status != rentalpb.TripStatus_TS_NOT_SPECIFIED {
 		filter[statusField] = status
 	}
 
+	//调用find，第一个参数是context，第二个是查询条件
+	//res类型是是mongo.Cursor
 	res, err := m.col.Find(c, filter)
 	if err != nil {
 		return nil, err
@@ -109,4 +113,33 @@ func (m *Mongo) GetTrips(c context.Context, accountID id.AccountID, status renta
 		trips = append(trips, &trip)
 	}
 	return trips, nil
+}
+
+//更新行程
+//用updatedAt实现一个乐观锁来解决同时更新的问题
+func (m *Mongo) UpdateTrip(c context.Context, tid id.TripID, aid id.AccountID, updatedAt int64, trip *rentalpb.Trip) error {
+	objID, err := objid.FromID(tid)
+	if err != nil {
+		return fmt.Errorf("invalid id:%v", err)
+	}
+
+	newUpdatedAt := mgutil.UpdateAt()
+	res, err := m.col.UpdateOne(c, bson.M{
+		mgutil.IDFieldName:        objID,
+		accountIDField:            aid.String(),
+		mgutil.UpdatedAtFieldName: updatedAt,
+	}, mgutil.Set(bson.M{
+		tripField:                 trip,
+		mgutil.UpdatedAtFieldName: newUpdatedAt,
+	}))
+
+	if err != nil {
+		return err
+	}
+
+	if res.MatchedCount == 0 {
+		//没有匹配任何的文档
+		return mongo.ErrNoDocuments
+	}
+	return nil
 }

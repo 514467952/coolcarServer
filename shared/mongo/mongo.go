@@ -11,7 +11,7 @@ import (
 
 const (
 	IDFieldName        = "_id"
-	UpdatedAtFieldName = "updateat"
+	UpdatedAtFieldName = "updatedat"
 )
 
 //Set returns a $set update document
