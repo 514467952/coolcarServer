@@ -248,103 +248,6 @@ func TestGetTrips(t *testing.T) {
 	}
 }
 
-// func TestUpdateTrip(t *testing.T) {
-// 	c := context.Background()
-// 	mc, err := mongotesting.NewClient(c)
-// 	if err != nil {
-// 		t.Fatalf("cannot connect mongodb: %v", err)
-// 	}
-
-// 	m := NewMongo(mc.Database("coolcar"))
-
-// 	//关心一条记录两个人同时更改的情况
-// 	//固定tripid
-// 	tid := id.TripID("5f8132eb12714bf629489054")
-// 	//构造用户id
-// 	aid := id.AccountID("account_for_update")
-// 	//构造时间
-// 	var now int64 = 10000
-// 	mgutil.NewObjectIDWithValue(tid)
-// 	mgutil.UpdateAt = func() int64 {
-// 		return now
-// 	}
-// 	//创建一个行程
-// 	tr, err := m.CreateTrip(c, &rentalpb.Trip{
-// 		AccountID: aid.String(),
-// 		Status:    rentalpb.TripStatus_IN_PROGRESS,
-// 		Start: &rentalpb.LocationStatus{
-// 			PoiName: "start_poi",
-// 		},
-// 	})
-
-// 	if err != nil {
-// 		t.Fatalf("cannot create trip:%v", err)
-// 	}
-
-// 	if tr.UpdateAt != 10000 {
-// 		t.Fatalf("wrong updateat; want: 10000, got:%d", tr.UpdateAt)
-// 	}
-
-// 	//构造一个更新后的行程
-// 	update := &rentalpb.Trip{
-// 		AccountID: aid.String(),
-// 		Status:    rentalpb.TripStatus_IN_PROGRESS,
-// 		Start: &rentalpb.LocationStatus{
-// 			PoiName: "start_poi_updated",
-// 		},
-// 	}
-
-// 	cases := []struct {
-// 		name         string
-// 		now          int64
-// 		withUpdateAt int64
-// 		wantErr      bool
-// 	}{
-// 		{
-// 			name:         "normal_update", //正常更新
-// 			now:          20000,           //在20000时更新完成
-// 			withUpdateAt: 10000,           //用20000去更新10000的时间戳
-// 		},
-// 		{
-// 			name:         "update_with_stale_timestamp", //较慢的更新
-// 			now:          30000,
-// 			withUpdateAt: 10000,
-// 			wantErr:      true,
-// 		},
-// 		{
-// 			name:         "update_with_refetch", //重新刷新后读数据
-// 			now:          40000,
-// 			withUpdateAt: 20000, //刷新后的数据应该是normal_update更新后的数据
-// 		},
-// 	}
-
-// 	for _, cc := range cases {
-// 		now = cc.now
-// 		err := m.UpdateTrip(c, tid, aid, cc.withUpdateAt, update)
-// 		if cc.wantErr {
-// 			if err == nil {
-// 				t.Errorf("%s want error;got none", cc.name)
-// 			} else {
-// 				//测试继续
-// 				continue
-// 			}
-// 		} else {
-// 			if err != nil {
-// 				t.Errorf("%s: cannot update: %v", cc.name, err)
-// 			}
-// 		}
-
-// 		updatedTrip, err := m.GetTrip(c, tid, aid)
-// 		if err != nil {
-// 			t.Errorf("%s:cannot get trip after update:%v", cc.name, err)
-// 		}
-
-// 		if cc.now != updatedTrip.UpdateAt {
-// 			t.Errorf("%s:incorrect update: want %d, got:%v", cc.name, cc.now, updatedTrip.UpdateAt)
-// 		}
-// 	}
-// }
-
 func TestUpdateTrip(t *testing.T) {
 	c := context.Background()
 	mc, err := mongotesting.NewClient(c)
@@ -353,15 +256,19 @@ func TestUpdateTrip(t *testing.T) {
 	}
 
 	m := NewMongo(mc.Database("coolcar"))
-	tid := id.TripID("5f8132eb12714bf629489054")
-	aid := id.AccountID("account_for_update")
 
+	//关心一条记录两个人同时更改的情况
+	//固定tripid
+	tid := id.TripID("5f8132eb12714bf629489054")
+	//构造用户id
+	aid := id.AccountID("account_for_update")
+	//构造时间
 	var now int64 = 10000
 	mgutil.NewObjectIDWithValue(tid)
 	mgutil.UpdateAt = func() int64 {
 		return now
 	}
-
+	//创建一个行程
 	tr, err := m.CreateTrip(c, &rentalpb.Trip{
 		AccountID: aid.String(),
 		Status:    rentalpb.TripStatus_IN_PROGRESS,
@@ -369,13 +276,16 @@ func TestUpdateTrip(t *testing.T) {
 			PoiName: "start_poi",
 		},
 	})
+
 	if err != nil {
-		t.Fatalf("cannot create trip: %v", err)
-	}
-	if tr.UpdateAt != 10000 {
-		t.Fatalf("wrong updatedat; want: 10000, got: %d", tr.UpdateAt)
+		t.Fatalf("cannot create trip:%v", err)
 	}
 
+	if tr.UpdateAt != 10000 {
+		t.Fatalf("wrong updateat; want: 10000, got:%d", tr.UpdateAt)
+	}
+
+	//构造一个更新后的行程
 	update := &rentalpb.Trip{
 		AccountID: aid.String(),
 		Status:    rentalpb.TripStatus_IN_PROGRESS,
@@ -383,51 +293,54 @@ func TestUpdateTrip(t *testing.T) {
 			PoiName: "start_poi_updated",
 		},
 	}
+
 	cases := []struct {
-		name          string
-		now           int64
-		withUpdatedAt int64
-		wantErr       bool
+		name         string
+		now          int64
+		withUpdateAt int64
+		wantErr      bool
 	}{
 		{
-			name:          "normal_update",
-			now:           20000,
-			withUpdatedAt: 10000,
+			name:         "normal_update", //正常更新
+			now:          20000,           //在20000时更新完成
+			withUpdateAt: 10000,           //用20000去更新10000的时间戳
 		},
 		{
-			name:          "update_with_stale_timestamp",
-			now:           30000,
-			withUpdatedAt: 10000,
-			wantErr:       true,
+			name:         "update_with_stale_timestamp", //较慢的更新
+			now:          30000,
+			withUpdateAt: 10000,
+			wantErr:      true,
 		},
 		{
-			name:          "update_with_refetch",
-			now:           40000,
-			withUpdatedAt: 20000,
+			name:         "update_with_refetch", //重新刷新后读数据
+			now:          40000,
+			withUpdateAt: 20000, //刷新后的数据应该是normal_update更新后的数据
 		},
 	}
 
 	for _, cc := range cases {
 		now = cc.now
-		err := m.UpdateTrip(c, tid, aid, cc.withUpdatedAt, update)
+		err := m.UpdateTrip(c, tid, aid, cc.withUpdateAt, update)
 		if cc.wantErr {
 			if err == nil {
-				t.Errorf("%s: want error; got none", cc.name)
+				t.Errorf("%s want error;got none", cc.name)
 			} else {
+				//测试继续
 				continue
 			}
 		} else {
 			if err != nil {
-				t.Fatalf("%s: cannot update: %v", cc.name, err)
+				t.Errorf("%s: cannot update: %v", cc.name, err)
 			}
 		}
+
 		updatedTrip, err := m.GetTrip(c, tid, aid)
 		if err != nil {
-			t.Errorf("%s: cannot get trip after udpate: %v", cc.name, err)
+			t.Errorf("%s:cannot get trip after update:%v", cc.name, err)
 		}
+
 		if cc.now != updatedTrip.UpdateAt {
-			t.Fatalf("%s: incorrect updatedat: want %d, got %d",
-				cc.name, cc.now, updatedTrip.UpdateAt)
+			t.Errorf("%s:incorrect update: want %d, got:%v", cc.name, cc.now, updatedTrip.UpdateAt)
 		}
 	}
 }
