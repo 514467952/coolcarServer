@@ -36,6 +36,7 @@ message Trip {
     LocationStatus current = 4; //当前点
     LocationStatus end = 5; //结束点
     TripStatus status = 6; //行程的状态
+    string identity_id = 7; //身份id
 }
 
 

@@ -17,3 +17,17 @@ type TripID string
 func (t TripID) String() string {
 	return string(t)
 }
+
+// IdentityID
+type IdentityID string
+
+func (i IdentityID) String() string {
+	return string(i)
+}
+
+// CarID
+type CarID string
+
+func (i CarID) String() string {
+	return string(i)
+}
