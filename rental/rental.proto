@@ -14,6 +14,7 @@ message LocationStatus {
     int32 fee_cent = 2;  //点的费用
     double km_driven = 3; //公里数
     string poi_name = 4; //行程的描述
+    int64 timestamp_sec = 5; //行程时间
 }
 
 enum TripStatus {

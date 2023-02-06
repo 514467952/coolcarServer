@@ -18,7 +18,7 @@ function genProto {
     #确保文件目录存在，如果不存在则创建
     mkdir -p $PBTS_OUT_DIR
     #-w es6使用es6的语法，auth.proto是当前目录下要有这个文件
-    $PBTS_BIN_DIR/pbjs -t static -w es6 ./${DOMAIN}/${DOMAIN}.proto --no--create --no--encode --no--decode --no--delimited -o $PBTS_OUT_DIR/${DOMAIN}_pb.js
+    $PBTS_BIN_DIR/pbjs -t static -w es6 ./${DOMAIN}/${DOMAIN}.proto --no--create --no--encode --no--decode --no--delimited --force-number -o $PBTS_OUT_DIR/${DOMAIN}_pb.js
     $PBTS_BIN_DIR/pbts -o $PBTS_OUT_DIR/${DOMAIN}_pb.d.ts $PBTS_OUT_DIR/${DOMAIN}_pb.js
 }
 
