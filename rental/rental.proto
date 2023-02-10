@@ -71,3 +71,42 @@ service TripService {
     rpc GetTrips (GetTripsRequest) returns (GetTripsResponse);
     rpc UpdateTrip (UpdateTripRequest) returns (Trip);
 }
+
+
+
+//Profile Service
+enum Gender {
+    G_NOT_SPECIFIED = 0;
+    MALE = 1;
+    FEMAEL = 2;
+}
+
+//身份信息认证状态
+enum IdentityStatus {
+    UNSUBMITTED = 0;  //未提交
+    PENDING = 1;     //认证中
+    VERIFIED = 2;   //已认证
+}
+
+//个人
+message Profile {
+    Identity identity = 1;  //个人身份数据
+    IdentityStatus identity_status = 2; //身份信息认证状态
+}
+
+//个人身份信息数据
+message Identity {
+    string lic_number = 1;  //身份证码
+    string name = 2;    //名字
+    Gender gender = 3;   //性别
+    int64 birth_date_millis = 4; //出生日期
+}
+
+message GetProfileRequest {}
+message ClearProfileRequest {}
+
+service ProfileService {
+    rpc GetProfile (GetProfileRequest) returns (Profile);
+    rpc SubmitProfile (Identity) returns (Profile);
+    rpc ClearProfile (ClearProfileRequest) returns (Profile);
+}

@@ -2330,6 +2330,1011 @@ export const rental = $root.rental = (() => {
             return TripService;
         })();
 
+        /**
+         * Gender enum.
+         * @name rental.v1.Gender
+         * @enum {number}
+         * @property {number} G_NOT_SPECIFIED=0 G_NOT_SPECIFIED value
+         * @property {number} MALE=1 MALE value
+         * @property {number} FEMAEL=2 FEMAEL value
+         */
+        v1.Gender = (function() {
+            const valuesById = {}, values = Object.create(valuesById);
+            values[valuesById[0] = "G_NOT_SPECIFIED"] = 0;
+            values[valuesById[1] = "MALE"] = 1;
+            values[valuesById[2] = "FEMAEL"] = 2;
+            return values;
+        })();
+
+        /**
+         * IdentityStatus enum.
+         * @name rental.v1.IdentityStatus
+         * @enum {number}
+         * @property {number} UNSUBMITTED=0 UNSUBMITTED value
+         * @property {number} PENDING=1 PENDING value
+         * @property {number} VERIFIED=2 VERIFIED value
+         */
+        v1.IdentityStatus = (function() {
+            const valuesById = {}, values = Object.create(valuesById);
+            values[valuesById[0] = "UNSUBMITTED"] = 0;
+            values[valuesById[1] = "PENDING"] = 1;
+            values[valuesById[2] = "VERIFIED"] = 2;
+            return values;
+        })();
+
+        v1.Profile = (function() {
+
+            /**
+             * Properties of a Profile.
+             * @memberof rental.v1
+             * @interface IProfile
+             * @property {rental.v1.IIdentity|null} [identity] Profile identity
+             * @property {rental.v1.IdentityStatus|null} [identityStatus] Profile identityStatus
+             */
+
+            /**
+             * Constructs a new Profile.
+             * @memberof rental.v1
+             * @classdesc Represents a Profile.
+             * @implements IProfile
+             * @constructor
+             * @param {rental.v1.IProfile=} [properties] Properties to set
+             */
+            function Profile(properties) {
+                if (properties)
+                    for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                        if (properties[keys[i]] != null)
+                            this[keys[i]] = properties[keys[i]];
+            }
+
+            /**
+             * Profile identity.
+             * @member {rental.v1.IIdentity|null|undefined} identity
+             * @memberof rental.v1.Profile
+             * @instance
+             */
+            Profile.prototype.identity = null;
+
+            /**
+             * Profile identityStatus.
+             * @member {rental.v1.IdentityStatus} identityStatus
+             * @memberof rental.v1.Profile
+             * @instance
+             */
+            Profile.prototype.identityStatus = 0;
+
+            /**
+             * Creates a new Profile instance using the specified properties.
+             * @function create
+             * @memberof rental.v1.Profile
+             * @static
+             * @param {rental.v1.IProfile=} [properties] Properties to set
+             * @returns {rental.v1.Profile} Profile instance
+             */
+            Profile.create = function create(properties) {
+                return new Profile(properties);
+            };
+
+            /**
+             * Encodes the specified Profile message. Does not implicitly {@link rental.v1.Profile.verify|verify} messages.
+             * @function encode
+             * @memberof rental.v1.Profile
+             * @static
+             * @param {rental.v1.IProfile} message Profile message or plain object to encode
+             * @param {$protobuf.Writer} [writer] Writer to encode to
+             * @returns {$protobuf.Writer} Writer
+             */
+            Profile.encode = function encode(message, writer) {
+                if (!writer)
+                    writer = $Writer.create();
+                if (message.identity != null && Object.hasOwnProperty.call(message, "identity"))
+                    $root.rental.v1.Identity.encode(message.identity, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
+                if (message.identityStatus != null && Object.hasOwnProperty.call(message, "identityStatus"))
+                    writer.uint32(/* id 2, wireType 0 =*/16).int32(message.identityStatus);
+                return writer;
+            };
+
+            /**
+             * Encodes the specified Profile message, length delimited. Does not implicitly {@link rental.v1.Profile.verify|verify} messages.
+             * @function encodeDelimited
+             * @memberof rental.v1.Profile
+             * @static
+             * @param {rental.v1.IProfile} message Profile message or plain object to encode
+             * @param {$protobuf.Writer} [writer] Writer to encode to
+             * @returns {$protobuf.Writer} Writer
+             */
+            Profile.encodeDelimited = function encodeDelimited(message, writer) {
+                return this.encode(message, writer).ldelim();
+            };
+
+            /**
+             * Decodes a Profile message from the specified reader or buffer.
+             * @function decode
+             * @memberof rental.v1.Profile
+             * @static
+             * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+             * @param {number} [length] Message length if known beforehand
+             * @returns {rental.v1.Profile} Profile
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            Profile.decode = function decode(reader, length) {
+                if (!(reader instanceof $Reader))
+                    reader = $Reader.create(reader);
+                let end = length === undefined ? reader.len : reader.pos + length, message = new $root.rental.v1.Profile();
+                while (reader.pos < end) {
+                    let tag = reader.uint32();
+                    switch (tag >>> 3) {
+                    case 1:
+                        message.identity = $root.rental.v1.Identity.decode(reader, reader.uint32());
+                        break;
+                    case 2:
+                        message.identityStatus = reader.int32();
+                        break;
+                    default:
+                        reader.skipType(tag & 7);
+                        break;
+                    }
+                }
+                return message;
+            };
+
+            /**
+             * Decodes a Profile message from the specified reader or buffer, length delimited.
+             * @function decodeDelimited
+             * @memberof rental.v1.Profile
+             * @static
+             * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+             * @returns {rental.v1.Profile} Profile
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            Profile.decodeDelimited = function decodeDelimited(reader) {
+                if (!(reader instanceof $Reader))
+                    reader = new $Reader(reader);
+                return this.decode(reader, reader.uint32());
+            };
+
+            /**
+             * Verifies a Profile message.
+             * @function verify
+             * @memberof rental.v1.Profile
+             * @static
+             * @param {Object.<string,*>} message Plain object to verify
+             * @returns {string|null} `null` if valid, otherwise the reason why it is not
+             */
+            Profile.verify = function verify(message) {
+                if (typeof message !== "object" || message === null)
+                    return "object expected";
+                if (message.identity != null && message.hasOwnProperty("identity")) {
+                    let error = $root.rental.v1.Identity.verify(message.identity);
+                    if (error)
+                        return "identity." + error;
+                }
+                if (message.identityStatus != null && message.hasOwnProperty("identityStatus"))
+                    switch (message.identityStatus) {
+                    default:
+                        return "identityStatus: enum value expected";
+                    case 0:
+                    case 1:
+                    case 2:
+                        break;
+                    }
+                return null;
+            };
+
+            /**
+             * Creates a Profile message from a plain object. Also converts values to their respective internal types.
+             * @function fromObject
+             * @memberof rental.v1.Profile
+             * @static
+             * @param {Object.<string,*>} object Plain object
+             * @returns {rental.v1.Profile} Profile
+             */
+            Profile.fromObject = function fromObject(object) {
+                if (object instanceof $root.rental.v1.Profile)
+                    return object;
+                let message = new $root.rental.v1.Profile();
+                if (object.identity != null) {
+                    if (typeof object.identity !== "object")
+                        throw TypeError(".rental.v1.Profile.identity: object expected");
+                    message.identity = $root.rental.v1.Identity.fromObject(object.identity);
+                }
+                switch (object.identityStatus) {
+                case "UNSUBMITTED":
+                case 0:
+                    message.identityStatus = 0;
+                    break;
+                case "PENDING":
+                case 1:
+                    message.identityStatus = 1;
+                    break;
+                case "VERIFIED":
+                case 2:
+                    message.identityStatus = 2;
+                    break;
+                }
+                return message;
+            };
+
+            /**
+             * Creates a plain object from a Profile message. Also converts values to other types if specified.
+             * @function toObject
+             * @memberof rental.v1.Profile
+             * @static
+             * @param {rental.v1.Profile} message Profile
+             * @param {$protobuf.IConversionOptions} [options] Conversion options
+             * @returns {Object.<string,*>} Plain object
+             */
+            Profile.toObject = function toObject(message, options) {
+                if (!options)
+                    options = {};
+                let object = {};
+                if (options.defaults) {
+                    object.identity = null;
+                    object.identityStatus = options.enums === String ? "UNSUBMITTED" : 0;
+                }
+                if (message.identity != null && message.hasOwnProperty("identity"))
+                    object.identity = $root.rental.v1.Identity.toObject(message.identity, options);
+                if (message.identityStatus != null && message.hasOwnProperty("identityStatus"))
+                    object.identityStatus = options.enums === String ? $root.rental.v1.IdentityStatus[message.identityStatus] : message.identityStatus;
+                return object;
+            };
+
+            /**
+             * Converts this Profile to JSON.
+             * @function toJSON
+             * @memberof rental.v1.Profile
+             * @instance
+             * @returns {Object.<string,*>} JSON object
+             */
+            Profile.prototype.toJSON = function toJSON() {
+                return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+            };
+
+            return Profile;
+        })();
+
+        v1.Identity = (function() {
+
+            /**
+             * Properties of an Identity.
+             * @memberof rental.v1
+             * @interface IIdentity
+             * @property {string|null} [licNumber] Identity licNumber
+             * @property {string|null} [name] Identity name
+             * @property {rental.v1.Gender|null} [gender] Identity gender
+             * @property {number|null} [birthDateMillis] Identity birthDateMillis
+             */
+
+            /**
+             * Constructs a new Identity.
+             * @memberof rental.v1
+             * @classdesc Represents an Identity.
+             * @implements IIdentity
+             * @constructor
+             * @param {rental.v1.IIdentity=} [properties] Properties to set
+             */
+            function Identity(properties) {
+                if (properties)
+                    for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                        if (properties[keys[i]] != null)
+                            this[keys[i]] = properties[keys[i]];
+            }
+
+            /**
+             * Identity licNumber.
+             * @member {string} licNumber
+             * @memberof rental.v1.Identity
+             * @instance
+             */
+            Identity.prototype.licNumber = "";
+
+            /**
+             * Identity name.
+             * @member {string} name
+             * @memberof rental.v1.Identity
+             * @instance
+             */
+            Identity.prototype.name = "";
+
+            /**
+             * Identity gender.
+             * @member {rental.v1.Gender} gender
+             * @memberof rental.v1.Identity
+             * @instance
+             */
+            Identity.prototype.gender = 0;
+
+            /**
+             * Identity birthDateMillis.
+             * @member {number} birthDateMillis
+             * @memberof rental.v1.Identity
+             * @instance
+             */
+            Identity.prototype.birthDateMillis = $util.Long ? $util.Long.fromBits(0,0,false) : 0;
+
+            /**
+             * Creates a new Identity instance using the specified properties.
+             * @function create
+             * @memberof rental.v1.Identity
+             * @static
+             * @param {rental.v1.IIdentity=} [properties] Properties to set
+             * @returns {rental.v1.Identity} Identity instance
+             */
+            Identity.create = function create(properties) {
+                return new Identity(properties);
+            };
+
+            /**
+             * Encodes the specified Identity message. Does not implicitly {@link rental.v1.Identity.verify|verify} messages.
+             * @function encode
+             * @memberof rental.v1.Identity
+             * @static
+             * @param {rental.v1.IIdentity} message Identity message or plain object to encode
+             * @param {$protobuf.Writer} [writer] Writer to encode to
+             * @returns {$protobuf.Writer} Writer
+             */
+            Identity.encode = function encode(message, writer) {
+                if (!writer)
+                    writer = $Writer.create();
+                if (message.licNumber != null && Object.hasOwnProperty.call(message, "licNumber"))
+                    writer.uint32(/* id 1, wireType 2 =*/10).string(message.licNumber);
+                if (message.name != null && Object.hasOwnProperty.call(message, "name"))
+                    writer.uint32(/* id 2, wireType 2 =*/18).string(message.name);
+                if (message.gender != null && Object.hasOwnProperty.call(message, "gender"))
+                    writer.uint32(/* id 3, wireType 0 =*/24).int32(message.gender);
+                if (message.birthDateMillis != null && Object.hasOwnProperty.call(message, "birthDateMillis"))
+                    writer.uint32(/* id 4, wireType 0 =*/32).int64(message.birthDateMillis);
+                return writer;
+            };
+
+            /**
+             * Encodes the specified Identity message, length delimited. Does not implicitly {@link rental.v1.Identity.verify|verify} messages.
+             * @function encodeDelimited
+             * @memberof rental.v1.Identity
+             * @static
+             * @param {rental.v1.IIdentity} message Identity message or plain object to encode
+             * @param {$protobuf.Writer} [writer] Writer to encode to
+             * @returns {$protobuf.Writer} Writer
+             */
+            Identity.encodeDelimited = function encodeDelimited(message, writer) {
+                return this.encode(message, writer).ldelim();
+            };
+
+            /**
+             * Decodes an Identity message from the specified reader or buffer.
+             * @function decode
+             * @memberof rental.v1.Identity
+             * @static
+             * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+             * @param {number} [length] Message length if known beforehand
+             * @returns {rental.v1.Identity} Identity
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            Identity.decode = function decode(reader, length) {
+                if (!(reader instanceof $Reader))
+                    reader = $Reader.create(reader);
+                let end = length === undefined ? reader.len : reader.pos + length, message = new $root.rental.v1.Identity();
+                while (reader.pos < end) {
+                    let tag = reader.uint32();
+                    switch (tag >>> 3) {
+                    case 1:
+                        message.licNumber = reader.string();
+                        break;
+                    case 2:
+                        message.name = reader.string();
+                        break;
+                    case 3:
+                        message.gender = reader.int32();
+                        break;
+                    case 4:
+                        message.birthDateMillis = reader.int64();
+                        break;
+                    default:
+                        reader.skipType(tag & 7);
+                        break;
+                    }
+                }
+                return message;
+            };
+
+            /**
+             * Decodes an Identity message from the specified reader or buffer, length delimited.
+             * @function decodeDelimited
+             * @memberof rental.v1.Identity
+             * @static
+             * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+             * @returns {rental.v1.Identity} Identity
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            Identity.decodeDelimited = function decodeDelimited(reader) {
+                if (!(reader instanceof $Reader))
+                    reader = new $Reader(reader);
+                return this.decode(reader, reader.uint32());
+            };
+
+            /**
+             * Verifies an Identity message.
+             * @function verify
+             * @memberof rental.v1.Identity
+             * @static
+             * @param {Object.<string,*>} message Plain object to verify
+             * @returns {string|null} `null` if valid, otherwise the reason why it is not
+             */
+            Identity.verify = function verify(message) {
+                if (typeof message !== "object" || message === null)
+                    return "object expected";
+                if (message.licNumber != null && message.hasOwnProperty("licNumber"))
+                    if (!$util.isString(message.licNumber))
+                        return "licNumber: string expected";
+                if (message.name != null && message.hasOwnProperty("name"))
+                    if (!$util.isString(message.name))
+                        return "name: string expected";
+                if (message.gender != null && message.hasOwnProperty("gender"))
+                    switch (message.gender) {
+                    default:
+                        return "gender: enum value expected";
+                    case 0:
+                    case 1:
+                    case 2:
+                        break;
+                    }
+                if (message.birthDateMillis != null && message.hasOwnProperty("birthDateMillis"))
+                    if (!$util.isInteger(message.birthDateMillis) && !(message.birthDateMillis && $util.isInteger(message.birthDateMillis.low) && $util.isInteger(message.birthDateMillis.high)))
+                        return "birthDateMillis: integer|Long expected";
+                return null;
+            };
+
+            /**
+             * Creates an Identity message from a plain object. Also converts values to their respective internal types.
+             * @function fromObject
+             * @memberof rental.v1.Identity
+             * @static
+             * @param {Object.<string,*>} object Plain object
+             * @returns {rental.v1.Identity} Identity
+             */
+            Identity.fromObject = function fromObject(object) {
+                if (object instanceof $root.rental.v1.Identity)
+                    return object;
+                let message = new $root.rental.v1.Identity();
+                if (object.licNumber != null)
+                    message.licNumber = String(object.licNumber);
+                if (object.name != null)
+                    message.name = String(object.name);
+                switch (object.gender) {
+                case "G_NOT_SPECIFIED":
+                case 0:
+                    message.gender = 0;
+                    break;
+                case "MALE":
+                case 1:
+                    message.gender = 1;
+                    break;
+                case "FEMAEL":
+                case 2:
+                    message.gender = 2;
+                    break;
+                }
+                if (object.birthDateMillis != null)
+                    if ($util.Long)
+                        (message.birthDateMillis = $util.Long.fromValue(object.birthDateMillis)).unsigned = false;
+                    else if (typeof object.birthDateMillis === "string")
+                        message.birthDateMillis = parseInt(object.birthDateMillis, 10);
+                    else if (typeof object.birthDateMillis === "number")
+                        message.birthDateMillis = object.birthDateMillis;
+                    else if (typeof object.birthDateMillis === "object")
+                        message.birthDateMillis = new $util.LongBits(object.birthDateMillis.low >>> 0, object.birthDateMillis.high >>> 0).toNumber();
+                return message;
+            };
+
+            /**
+             * Creates a plain object from an Identity message. Also converts values to other types if specified.
+             * @function toObject
+             * @memberof rental.v1.Identity
+             * @static
+             * @param {rental.v1.Identity} message Identity
+             * @param {$protobuf.IConversionOptions} [options] Conversion options
+             * @returns {Object.<string,*>} Plain object
+             */
+            Identity.toObject = function toObject(message, options) {
+                if (!options)
+                    options = {};
+                let object = {};
+                if (options.defaults) {
+                    object.licNumber = "";
+                    object.name = "";
+                    object.gender = options.enums === String ? "G_NOT_SPECIFIED" : 0;
+                    if ($util.Long) {
+                        let long = new $util.Long(0, 0, false);
+                        object.birthDateMillis = options.longs === String ? long.toString() : options.longs === Number ? long.toNumber() : long;
+                    } else
+                        object.birthDateMillis = options.longs === String ? "0" : 0;
+                }
+                if (message.licNumber != null && message.hasOwnProperty("licNumber"))
+                    object.licNumber = message.licNumber;
+                if (message.name != null && message.hasOwnProperty("name"))
+                    object.name = message.name;
+                if (message.gender != null && message.hasOwnProperty("gender"))
+                    object.gender = options.enums === String ? $root.rental.v1.Gender[message.gender] : message.gender;
+                if (message.birthDateMillis != null && message.hasOwnProperty("birthDateMillis"))
+                    if (typeof message.birthDateMillis === "number")
+                        object.birthDateMillis = options.longs === String ? String(message.birthDateMillis) : message.birthDateMillis;
+                    else
+                        object.birthDateMillis = options.longs === String ? $util.Long.prototype.toString.call(message.birthDateMillis) : options.longs === Number ? new $util.LongBits(message.birthDateMillis.low >>> 0, message.birthDateMillis.high >>> 0).toNumber() : message.birthDateMillis;
+                return object;
+            };
+
+            /**
+             * Converts this Identity to JSON.
+             * @function toJSON
+             * @memberof rental.v1.Identity
+             * @instance
+             * @returns {Object.<string,*>} JSON object
+             */
+            Identity.prototype.toJSON = function toJSON() {
+                return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+            };
+
+            return Identity;
+        })();
+
+        v1.GetProfileRequest = (function() {
+
+            /**
+             * Properties of a GetProfileRequest.
+             * @memberof rental.v1
+             * @interface IGetProfileRequest
+             */
+
+            /**
+             * Constructs a new GetProfileRequest.
+             * @memberof rental.v1
+             * @classdesc Represents a GetProfileRequest.
+             * @implements IGetProfileRequest
+             * @constructor
+             * @param {rental.v1.IGetProfileRequest=} [properties] Properties to set
+             */
+            function GetProfileRequest(properties) {
+                if (properties)
+                    for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                        if (properties[keys[i]] != null)
+                            this[keys[i]] = properties[keys[i]];
+            }
+
+            /**
+             * Creates a new GetProfileRequest instance using the specified properties.
+             * @function create
+             * @memberof rental.v1.GetProfileRequest
+             * @static
+             * @param {rental.v1.IGetProfileRequest=} [properties] Properties to set
+             * @returns {rental.v1.GetProfileRequest} GetProfileRequest instance
+             */
+            GetProfileRequest.create = function create(properties) {
+                return new GetProfileRequest(properties);
+            };
+
+            /**
+             * Encodes the specified GetProfileRequest message. Does not implicitly {@link rental.v1.GetProfileRequest.verify|verify} messages.
+             * @function encode
+             * @memberof rental.v1.GetProfileRequest
+             * @static
+             * @param {rental.v1.IGetProfileRequest} message GetProfileRequest message or plain object to encode
+             * @param {$protobuf.Writer} [writer] Writer to encode to
+             * @returns {$protobuf.Writer} Writer
+             */
+            GetProfileRequest.encode = function encode(message, writer) {
+                if (!writer)
+                    writer = $Writer.create();
+                return writer;
+            };
+
+            /**
+             * Encodes the specified GetProfileRequest message, length delimited. Does not implicitly {@link rental.v1.GetProfileRequest.verify|verify} messages.
+             * @function encodeDelimited
+             * @memberof rental.v1.GetProfileRequest
+             * @static
+             * @param {rental.v1.IGetProfileRequest} message GetProfileRequest message or plain object to encode
+             * @param {$protobuf.Writer} [writer] Writer to encode to
+             * @returns {$protobuf.Writer} Writer
+             */
+            GetProfileRequest.encodeDelimited = function encodeDelimited(message, writer) {
+                return this.encode(message, writer).ldelim();
+            };
+
+            /**
+             * Decodes a GetProfileRequest message from the specified reader or buffer.
+             * @function decode
+             * @memberof rental.v1.GetProfileRequest
+             * @static
+             * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+             * @param {number} [length] Message length if known beforehand
+             * @returns {rental.v1.GetProfileRequest} GetProfileRequest
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            GetProfileRequest.decode = function decode(reader, length) {
+                if (!(reader instanceof $Reader))
+                    reader = $Reader.create(reader);
+                let end = length === undefined ? reader.len : reader.pos + length, message = new $root.rental.v1.GetProfileRequest();
+                while (reader.pos < end) {
+                    let tag = reader.uint32();
+                    switch (tag >>> 3) {
+                    default:
+                        reader.skipType(tag & 7);
+                        break;
+                    }
+                }
+                return message;
+            };
+
+            /**
+             * Decodes a GetProfileRequest message from the specified reader or buffer, length delimited.
+             * @function decodeDelimited
+             * @memberof rental.v1.GetProfileRequest
+             * @static
+             * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+             * @returns {rental.v1.GetProfileRequest} GetProfileRequest
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            GetProfileRequest.decodeDelimited = function decodeDelimited(reader) {
+                if (!(reader instanceof $Reader))
+                    reader = new $Reader(reader);
+                return this.decode(reader, reader.uint32());
+            };
+
+            /**
+             * Verifies a GetProfileRequest message.
+             * @function verify
+             * @memberof rental.v1.GetProfileRequest
+             * @static
+             * @param {Object.<string,*>} message Plain object to verify
+             * @returns {string|null} `null` if valid, otherwise the reason why it is not
+             */
+            GetProfileRequest.verify = function verify(message) {
+                if (typeof message !== "object" || message === null)
+                    return "object expected";
+                return null;
+            };
+
+            /**
+             * Creates a GetProfileRequest message from a plain object. Also converts values to their respective internal types.
+             * @function fromObject
+             * @memberof rental.v1.GetProfileRequest
+             * @static
+             * @param {Object.<string,*>} object Plain object
+             * @returns {rental.v1.GetProfileRequest} GetProfileRequest
+             */
+            GetProfileRequest.fromObject = function fromObject(object) {
+                if (object instanceof $root.rental.v1.GetProfileRequest)
+                    return object;
+                return new $root.rental.v1.GetProfileRequest();
+            };
+
+            /**
+             * Creates a plain object from a GetProfileRequest message. Also converts values to other types if specified.
+             * @function toObject
+             * @memberof rental.v1.GetProfileRequest
+             * @static
+             * @param {rental.v1.GetProfileRequest} message GetProfileRequest
+             * @param {$protobuf.IConversionOptions} [options] Conversion options
+             * @returns {Object.<string,*>} Plain object
+             */
+            GetProfileRequest.toObject = function toObject() {
+                return {};
+            };
+
+            /**
+             * Converts this GetProfileRequest to JSON.
+             * @function toJSON
+             * @memberof rental.v1.GetProfileRequest
+             * @instance
+             * @returns {Object.<string,*>} JSON object
+             */
+            GetProfileRequest.prototype.toJSON = function toJSON() {
+                return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+            };
+
+            return GetProfileRequest;
+        })();
+
+        v1.ClearProfileRequest = (function() {
+
+            /**
+             * Properties of a ClearProfileRequest.
+             * @memberof rental.v1
+             * @interface IClearProfileRequest
+             */
+
+            /**
+             * Constructs a new ClearProfileRequest.
+             * @memberof rental.v1
+             * @classdesc Represents a ClearProfileRequest.
+             * @implements IClearProfileRequest
+             * @constructor
+             * @param {rental.v1.IClearProfileRequest=} [properties] Properties to set
+             */
+            function ClearProfileRequest(properties) {
+                if (properties)
+                    for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                        if (properties[keys[i]] != null)
+                            this[keys[i]] = properties[keys[i]];
+            }
+
+            /**
+             * Creates a new ClearProfileRequest instance using the specified properties.
+             * @function create
+             * @memberof rental.v1.ClearProfileRequest
+             * @static
+             * @param {rental.v1.IClearProfileRequest=} [properties] Properties to set
+             * @returns {rental.v1.ClearProfileRequest} ClearProfileRequest instance
+             */
+            ClearProfileRequest.create = function create(properties) {
+                return new ClearProfileRequest(properties);
+            };
+
+            /**
+             * Encodes the specified ClearProfileRequest message. Does not implicitly {@link rental.v1.ClearProfileRequest.verify|verify} messages.
+             * @function encode
+             * @memberof rental.v1.ClearProfileRequest
+             * @static
+             * @param {rental.v1.IClearProfileRequest} message ClearProfileRequest message or plain object to encode
+             * @param {$protobuf.Writer} [writer] Writer to encode to
+             * @returns {$protobuf.Writer} Writer
+             */
+            ClearProfileRequest.encode = function encode(message, writer) {
+                if (!writer)
+                    writer = $Writer.create();
+                return writer;
+            };
+
+            /**
+             * Encodes the specified ClearProfileRequest message, length delimited. Does not implicitly {@link rental.v1.ClearProfileRequest.verify|verify} messages.
+             * @function encodeDelimited
+             * @memberof rental.v1.ClearProfileRequest
+             * @static
+             * @param {rental.v1.IClearProfileRequest} message ClearProfileRequest message or plain object to encode
+             * @param {$protobuf.Writer} [writer] Writer to encode to
+             * @returns {$protobuf.Writer} Writer
+             */
+            ClearProfileRequest.encodeDelimited = function encodeDelimited(message, writer) {
+                return this.encode(message, writer).ldelim();
+            };
+
+            /**
+             * Decodes a ClearProfileRequest message from the specified reader or buffer.
+             * @function decode
+             * @memberof rental.v1.ClearProfileRequest
+             * @static
+             * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+             * @param {number} [length] Message length if known beforehand
+             * @returns {rental.v1.ClearProfileRequest} ClearProfileRequest
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            ClearProfileRequest.decode = function decode(reader, length) {
+                if (!(reader instanceof $Reader))
+                    reader = $Reader.create(reader);
+                let end = length === undefined ? reader.len : reader.pos + length, message = new $root.rental.v1.ClearProfileRequest();
+                while (reader.pos < end) {
+                    let tag = reader.uint32();
+                    switch (tag >>> 3) {
+                    default:
+                        reader.skipType(tag & 7);
+                        break;
+                    }
+                }
+                return message;
+            };
+
+            /**
+             * Decodes a ClearProfileRequest message from the specified reader or buffer, length delimited.
+             * @function decodeDelimited
+             * @memberof rental.v1.ClearProfileRequest
+             * @static
+             * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+             * @returns {rental.v1.ClearProfileRequest} ClearProfileRequest
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            ClearProfileRequest.decodeDelimited = function decodeDelimited(reader) {
+                if (!(reader instanceof $Reader))
+                    reader = new $Reader(reader);
+                return this.decode(reader, reader.uint32());
+            };
+
+            /**
+             * Verifies a ClearProfileRequest message.
+             * @function verify
+             * @memberof rental.v1.ClearProfileRequest
+             * @static
+             * @param {Object.<string,*>} message Plain object to verify
+             * @returns {string|null} `null` if valid, otherwise the reason why it is not
+             */
+            ClearProfileRequest.verify = function verify(message) {
+                if (typeof message !== "object" || message === null)
+                    return "object expected";
+                return null;
+            };
+
+            /**
+             * Creates a ClearProfileRequest message from a plain object. Also converts values to their respective internal types.
+             * @function fromObject
+             * @memberof rental.v1.ClearProfileRequest
+             * @static
+             * @param {Object.<string,*>} object Plain object
+             * @returns {rental.v1.ClearProfileRequest} ClearProfileRequest
+             */
+            ClearProfileRequest.fromObject = function fromObject(object) {
+                if (object instanceof $root.rental.v1.ClearProfileRequest)
+                    return object;
+                return new $root.rental.v1.ClearProfileRequest();
+            };
+
+            /**
+             * Creates a plain object from a ClearProfileRequest message. Also converts values to other types if specified.
+             * @function toObject
+             * @memberof rental.v1.ClearProfileRequest
+             * @static
+             * @param {rental.v1.ClearProfileRequest} message ClearProfileRequest
+             * @param {$protobuf.IConversionOptions} [options] Conversion options
+             * @returns {Object.<string,*>} Plain object
+             */
+            ClearProfileRequest.toObject = function toObject() {
+                return {};
+            };
+
+            /**
+             * Converts this ClearProfileRequest to JSON.
+             * @function toJSON
+             * @memberof rental.v1.ClearProfileRequest
+             * @instance
+             * @returns {Object.<string,*>} JSON object
+             */
+            ClearProfileRequest.prototype.toJSON = function toJSON() {
+                return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+            };
+
+            return ClearProfileRequest;
+        })();
+
+        v1.ProfileService = (function() {
+
+            /**
+             * Constructs a new ProfileService service.
+             * @memberof rental.v1
+             * @classdesc Represents a ProfileService
+             * @extends $protobuf.rpc.Service
+             * @constructor
+             * @param {$protobuf.RPCImpl} rpcImpl RPC implementation
+             * @param {boolean} [requestDelimited=false] Whether requests are length-delimited
+             * @param {boolean} [responseDelimited=false] Whether responses are length-delimited
+             */
+            function ProfileService(rpcImpl, requestDelimited, responseDelimited) {
+                $protobuf.rpc.Service.call(this, rpcImpl, requestDelimited, responseDelimited);
+            }
+
+            (ProfileService.prototype = Object.create($protobuf.rpc.Service.prototype)).constructor = ProfileService;
+
+            /**
+             * Creates new ProfileService service using the specified rpc implementation.
+             * @function create
+             * @memberof rental.v1.ProfileService
+             * @static
+             * @param {$protobuf.RPCImpl} rpcImpl RPC implementation
+             * @param {boolean} [requestDelimited=false] Whether requests are length-delimited
+             * @param {boolean} [responseDelimited=false] Whether responses are length-delimited
+             * @returns {ProfileService} RPC service. Useful where requests and/or responses are streamed.
+             */
+            ProfileService.create = function create(rpcImpl, requestDelimited, responseDelimited) {
+                return new this(rpcImpl, requestDelimited, responseDelimited);
+            };
+
+            /**
+             * Callback as used by {@link rental.v1.ProfileService#getProfile}.
+             * @memberof rental.v1.ProfileService
+             * @typedef GetProfileCallback
+             * @type {function}
+             * @param {Error|null} error Error, if any
+             * @param {rental.v1.Profile} [response] Profile
+             */
+
+            /**
+             * Calls GetProfile.
+             * @function getProfile
+             * @memberof rental.v1.ProfileService
+             * @instance
+             * @param {rental.v1.IGetProfileRequest} request GetProfileRequest message or plain object
+             * @param {rental.v1.ProfileService.GetProfileCallback} callback Node-style callback called with the error, if any, and Profile
+             * @returns {undefined}
+             * @variation 1
+             */
+            Object.defineProperty(ProfileService.prototype.getProfile = function getProfile(request, callback) {
+                return this.rpcCall(getProfile, $root.rental.v1.GetProfileRequest, $root.rental.v1.Profile, request, callback);
+            }, "name", { value: "GetProfile" });
+
+            /**
+             * Calls GetProfile.
+             * @function getProfile
+             * @memberof rental.v1.ProfileService
+             * @instance
+             * @param {rental.v1.IGetProfileRequest} request GetProfileRequest message or plain object
+             * @returns {Promise<rental.v1.Profile>} Promise
+             * @variation 2
+             */
+
+            /**
+             * Callback as used by {@link rental.v1.ProfileService#submitProfile}.
+             * @memberof rental.v1.ProfileService
+             * @typedef SubmitProfileCallback
+             * @type {function}
+             * @param {Error|null} error Error, if any
+             * @param {rental.v1.Profile} [response] Profile
+             */
+
+            /**
+             * Calls SubmitProfile.
+             * @function submitProfile
+             * @memberof rental.v1.ProfileService
+             * @instance
+             * @param {rental.v1.IIdentity} request Identity message or plain object
+             * @param {rental.v1.ProfileService.SubmitProfileCallback} callback Node-style callback called with the error, if any, and Profile
+             * @returns {undefined}
+             * @variation 1
+             */
+            Object.defineProperty(ProfileService.prototype.submitProfile = function submitProfile(request, callback) {
+                return this.rpcCall(submitProfile, $root.rental.v1.Identity, $root.rental.v1.Profile, request, callback);
+            }, "name", { value: "SubmitProfile" });
+
+            /**
+             * Calls SubmitProfile.
+             * @function submitProfile
+             * @memberof rental.v1.ProfileService
+             * @instance
+             * @param {rental.v1.IIdentity} request Identity message or plain object
+             * @returns {Promise<rental.v1.Profile>} Promise
+             * @variation 2
+             */
+
+            /**
+             * Callback as used by {@link rental.v1.ProfileService#clearProfile}.
+             * @memberof rental.v1.ProfileService
+             * @typedef ClearProfileCallback
+             * @type {function}
+             * @param {Error|null} error Error, if any
+             * @param {rental.v1.Profile} [response] Profile
+             */
+
+            /**
+             * Calls ClearProfile.
+             * @function clearProfile
+             * @memberof rental.v1.ProfileService
+             * @instance
+             * @param {rental.v1.IClearProfileRequest} request ClearProfileRequest message or plain object
+             * @param {rental.v1.ProfileService.ClearProfileCallback} callback Node-style callback called with the error, if any, and Profile
+             * @returns {undefined}
+             * @variation 1
+             */
+            Object.defineProperty(ProfileService.prototype.clearProfile = function clearProfile(request, callback) {
+                return this.rpcCall(clearProfile, $root.rental.v1.ClearProfileRequest, $root.rental.v1.Profile, request, callback);
+            }, "name", { value: "ClearProfile" });
+
+            /**
+             * Calls ClearProfile.
+             * @function clearProfile
+             * @memberof rental.v1.ProfileService
+             * @instance
+             * @param {rental.v1.IClearProfileRequest} request ClearProfileRequest message or plain object
+             * @returns {Promise<rental.v1.Profile>} Promise
+             * @variation 2
+             */
+
+            return ProfileService;
+        })();
+
         return v1;
     })();
 
