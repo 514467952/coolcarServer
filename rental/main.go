@@ -3,11 +3,13 @@ package main
 import (
 	"context"
 	rentalpb "coolcar/rental/api/gen/v1/rental"
+	profile "coolcar/rental/profile"
+	profiledao "coolcar/rental/profile/dao"
 	"coolcar/rental/trip"
 	poi "coolcar/rental/trip/client"
 	"coolcar/rental/trip/client/car"
-	"coolcar/rental/trip/client/profile"
-	"coolcar/rental/trip/dao"
+	profileClient "coolcar/rental/trip/client/profile"
+	tripdao "coolcar/rental/trip/dao"
 	"coolcar/shared/sharedserver"
 	"log"
 
@@ -31,6 +33,8 @@ func main() {
 		logger.Fatal("auth main cannot connect mongodb", zap.Error(err))
 	}
 
+	db := mongoClient.Database("coolcar")
+
 	err = sharedserver.RunGRPCServer(&sharedserver.GRPCConfig{
 		Name:              "rental",
 		Addr:              ":8082",
@@ -39,10 +43,14 @@ func main() {
 		RegisterFunc: func(s *grpc.Server) {
 			rentalpb.RegisterTripServiceServer(s, &trip.Service{
 				CarManager:     &car.Manager{},
-				ProfileManager: &profile.Manager{},
+				ProfileManager: &profileClient.Manager{},
 				POIManager:     &poi.Manager{},
-				Mongo:          dao.NewMongo(mongoClient.Database("coolcar")),
+				Mongo:          tripdao.NewMongo(db),
 				Logger:         logger,
+			})
+			rentalpb.RegisterProfileServiceServer(s, &profile.Service{
+				Mongo:  profiledao.NewMongo(db),
+				Logger: logger,
 			})
 		},
 	})
