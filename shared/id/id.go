@@ -31,3 +31,10 @@ type CarID string
 func (i CarID) String() string {
 	return string(i)
 }
+
+// BlobID
+type BlobID string
+
+func (i BlobID) String() string {
+	return string(i)
+}
