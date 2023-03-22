@@ -5,6 +5,10 @@ import (
 	blobpb "coolcar/blob/api/gen/v1/blob"
 	dao "coolcar/blob/dao"
 	"coolcar/shared/id"
+	"io"
+	"io/ioutil"
+	"net/http"
+	"time"
 
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.uber.org/zap"
@@ -12,9 +16,15 @@ import (
 	"google.golang.org/grpc/status"
 )
 
+type Storage interface {
+	SignURL(c context.Context, method, path string, timeout time.Duration) (string, error)
+	Get(c context.Context, path string) (io.ReadCloser, error)
+}
+
 type Service struct {
-	Mongo  *dao.Mongo
-	Logger *zap.Logger
+	Storage Storage
+	Mongo   *dao.Mongo
+	Logger  *zap.Logger
 }
 
 //CreateBlob
@@ -26,7 +36,16 @@ func (s *Service) CreateBlob(c context.Context, req *blobpb.CreateBlobRequest) (
 		s.Logger.Error("cannot create blob", zap.Error(err))
 		return nil, status.Error(codes.Internal, "")
 	}
-	return nil, status.Error(codes.Unimplemented, "")
+
+	url, err := s.Storage.SignURL(c, http.MethodPut, br.Path, secToDuration(req.UploadUrlTimeoutSec))
+	if err != nil {
+		return nil, status.Errorf(codes.Aborted, "cannot sign url:%v", err)
+	}
+
+	return &blobpb.CreateBlobResponse{
+		Id:        br.ID.Hex(),
+		UploadUrl: url,
+	}, nil
 }
 
 //GetBlob
@@ -35,7 +54,20 @@ func (s *Service) GetBlob(c context.Context, req *blobpb.GetBlobRequest) (*blobp
 	if err != nil {
 		return nil, err
 	}
-	return nil, status.Error(codes.Unimplemented, "")
+	r, err := s.Storage.Get(c, br.Path)
+	if r != nil {
+		defer r.Close()
+	}
+	if err != nil {
+		return nil, status.Errorf(codes.Aborted, "cannot get storage:%v", err)
+	}
+	b, err := ioutil.ReadAll(r)
+	if err != nil {
+		return nil, status.Errorf(codes.Aborted, "cannot read r :%v", err)
+	}
+	return &blobpb.GetBlobResponse{
+		Data: b,
+	}, nil
 }
 
 //GetBlobURL
@@ -44,7 +76,15 @@ func (s *Service) GetBlobURL(c context.Context, req *blobpb.GetBlobURLRequest) (
 	if err != nil {
 		return nil, err
 	}
-	return nil, status.Error(codes.Unimplemented, "")
+
+	u, err := s.Storage.SignURL(c, http.MethodGet, br.Path, secToDuration(req.TimeoutSec))
+	if err != nil {
+		return nil, status.Errorf(codes.Aborted, "GetBlobURL cannot sign url:%v", err)
+	}
+
+	return &blobpb.GetBlobURLResponse{
+		Url: u,
+	}, nil
 }
 
 func (s *Service) getBlobRecord(c context.Context, bid id.BlobID) (*dao.BlobRecord, error) {
@@ -56,4 +96,8 @@ func (s *Service) getBlobRecord(c context.Context, bid id.BlobID) (*dao.BlobReco
 	}
 
 	return br, nil
+}
+
+func secToDuration(sec int32) time.Duration {
+	return time.Duration(sec) * time.Second
 }

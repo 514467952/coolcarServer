@@ -4,6 +4,7 @@ import (
 	"context"
 	blobpb "coolcar/blob/api/gen/v1/blob"
 	"coolcar/blob/blob"
+	"coolcar/blob/cos"
 	"coolcar/blob/dao"
 	"coolcar/shared/sharedserver"
 	"flag"
@@ -11,6 +12,7 @@ import (
 
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
+	"go.uber.org/zap"
 	"google.golang.org/grpc"
 )
 
@@ -29,14 +31,19 @@ func main() {
 	}
 	db := mongoClient.Database("coolcar")
 
+	st, err := cos.NewClient("https://coolcar-1300226989.cos.ap-beijing.myqcloud.com", "AKIDRfieXFjpgGjz1sToupWyUklW0DCuKTM5", "dXEm5KL9sSmoa8cu55pIUdd4NWdXBZia")
+	if err != nil {
+		logger.Fatal("cannot create cos server", zap.Error(err))
+	}
 	logger.Sugar().Fatal(sharedserver.RunGRPCServer(&sharedserver.GRPCConfig{
 		Name:   "blob",
 		Addr:   ":8083",
 		Logger: logger,
 		RegisterFunc: func(s *grpc.Server) {
 			blobpb.RegisterBlobServiceServer(s, &blob.Service{
-				Mongo:  dao.NewMongo(db),
-				Logger: logger,
+				Storage: st,
+				Mongo:   dao.NewMongo(db),
+				Logger:  logger,
 			})
 		},
 	}))
