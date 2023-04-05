@@ -50,3 +50,19 @@ func SetOnInsert(v interface{}) bson.M {
 		"$setOnInsert": v,
 	}
 }
+
+//数据库条件判断，条件为空或者不存在
+func ZeroOrDoesNotExist(field string, zero interface{}) bson.M {
+	return bson.M{
+		"$or": []bson.M{
+			{
+				field: zero,
+			},
+			{
+				field: bson.M{
+					"$exists": false,
+				},
+			},
+		},
+	}
+}
