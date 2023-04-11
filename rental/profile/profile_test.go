@@ -2,6 +2,7 @@ package profile
 
 import (
 	"context"
+	blobpb "coolcar/blob/api/gen/v1/blob"
 	rentalpb "coolcar/rental/api/gen/v1/rental"
 	"coolcar/rental/profile/dao"
 	sharedauth "coolcar/shared/auth"
@@ -10,29 +11,17 @@ import (
 	mongotesting "coolcar/shared/testing"
 	"os"
 	"testing"
+
+	"google.golang.org/grpc"
 )
 
 func TestProfileLifecyle(t *testing.T) {
 	c := context.Background()
-	mc, err := mongotesting.NewClient(c)
-	if err != nil {
-		t.Fatalf("cannot create new mongo client%v", err)
-	}
 
-	db := mc.Database("trip")
-	mongotesting.SetupIndexes(c, db)
-	logger, err := sharedserver.NewZapLogger()
-	if err != nil {
-		t.Fatalf("cannot create logger : %v", err)
-	}
+	s := newService(c, t)
 
 	aid := id.AccountID("account1")
 	c = sharedauth.ContextWithAccountID(c, aid)
-	s := Service{
-		Mongo:  dao.NewMongo(db),
-		Logger: logger,
-	}
-
 	cases := []struct {
 		name       string
 		op         func() (*rentalpb.Profile, error)
@@ -115,6 +104,102 @@ func TestProfileLifecyle(t *testing.T) {
 			t.Errorf("%s: status field incorrect: want %s, got %s", cc.name, cc.wantStatus, p.IdentityStatus)
 		}
 	}
+}
+
+func TestProfilePhotoLifecycle(t *testing.T) {
+	c := sharedauth.ContextWithAccountID(context.Background(), id.AccountID("account1"))
+	s := newService(c, t)
+	s.BlobClient = &blobClient{
+		idForCreate: "blob1",
+	}
+
+	cases := []struct {
+		name    string
+		op      func() (string, error)
+		wantURL string
+	}{
+		{
+			name: "create_photo",
+			op: func() (string, error) {
+				r, err := s.CreateProfilePhoto(c, &rentalpb.CreateProfilePhotoRequest{})
+				if err != nil {
+					return "", err
+				}
+				return r.UploadUrl, nil
+			},
+			wantURL: "upload_url for blob1",
+		},
+		{
+			name: "complete_photo_upload",
+			op: func() (string, error) {
+				_, err := s.CompleteProfilePhoto(c, &rentalpb.CompleteProfilePhotoRequest{})
+				return "", err
+			},
+		},
+		{
+			name: "get_photo_url",
+			op: func() (string, error) {
+				r, err := s.GetProfilePhoto(c, &rentalpb.GetProfilePhotoRequest{})
+				if err != nil {
+					return "", err
+				}
+				return r.UploadUrl, nil
+			},
+			wantURL: "get_url for blob1",
+		},
+	}
+
+	for _, cc := range cases {
+		got, err := cc.op()
+		if err != nil {
+			t.Errorf("%s: operation failed:%v", cc.name, err)
+		}
+		if got != cc.wantURL {
+			t.Errorf("%s:wrong url:%q,got:%q", cc.name, cc.wantURL, got)
+		}
+	}
+}
+
+//公共方法--创建客户端
+func newService(c context.Context, t *testing.T) *Service {
+	mc, err := mongotesting.NewClient(c)
+	if err != nil {
+		t.Fatalf("cannot create new mongo client%v", err)
+	}
+
+	db := mc.Database("trip")
+	mongotesting.SetupIndexes(c, db)
+	logger, err := sharedserver.NewZapLogger()
+	if err != nil {
+		t.Fatalf("cannot create logger : %v", err)
+	}
+
+	return &Service{
+		Mongo:  dao.NewMongo(db),
+		Logger: logger,
+	}
+}
+
+//自己写一个blob客户端
+type blobClient struct {
+	idForCreate string //控制blob的id
+}
+
+func (b *blobClient) CreateBlob(ctx context.Context, in *blobpb.CreateBlobRequest, opts ...grpc.CallOption) (*blobpb.CreateBlobResponse, error) {
+	return &blobpb.CreateBlobResponse{
+		Id:        b.idForCreate,
+		UploadUrl: "upload_url for " + b.idForCreate,
+	}, nil
+}
+
+func (b *blobClient) GetBlob(ctx context.Context, in *blobpb.GetBlobRequest, opts ...grpc.CallOption) (*blobpb.GetBlobResponse, error) {
+	return &blobpb.GetBlobResponse{}, nil
+}
+
+func (b *blobClient) GetBlobURL(ctx context.Context, in *blobpb.GetBlobURLRequest, opts ...grpc.CallOption) (*blobpb.GetBlobURLResponse, error) {
+	return &blobpb.GetBlobURLResponse{
+		Url: "get_url for " + in.Id,
+	}, nil
 }
 
 func TestMain(m *testing.M) {
