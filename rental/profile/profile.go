@@ -94,6 +94,7 @@ func (s *Service) ClearProfile(c context.Context, req *rentalpb.ClearProfileRequ
 	return p, nil
 }
 
+//获取驾照信息
 func (s *Service) GetProfilePhoto(c context.Context, req *rentalpb.GetProfilePhotoRequest) (*rentalpb.GetProfilePhotoResponse, error) {
 	aid, err := sharedauth.AccountIDFromContext(c)
 	if err != nil {
@@ -122,6 +123,7 @@ func (s *Service) GetProfilePhoto(c context.Context, req *rentalpb.GetProfilePho
 	}, nil
 }
 
+//创建驾照信息
 func (s *Service) CreateProfilePhoto(c context.Context, req *rentalpb.CreateProfilePhotoRequest) (*rentalpb.CreateProfilePhotoResponse, error) {
 	aid, err := sharedauth.AccountIDFromContext(c)
 	if err != nil {
@@ -147,6 +149,7 @@ func (s *Service) CreateProfilePhoto(c context.Context, req *rentalpb.CreateProf
 		UploadUrl: br.UploadUrl,
 	}, nil
 }
+
 func (s *Service) CompleteProfilePhoto(c context.Context, req *rentalpb.CompleteProfilePhotoRequest) (*rentalpb.Identity, error) {
 	aid, err := sharedauth.AccountIDFromContext(c)
 	if err != nil {
@@ -176,6 +179,19 @@ func (s *Service) CompleteProfilePhoto(c context.Context, req *rentalpb.Complete
 		Gender:          rentalpb.Gender_FEMAEL,
 		BirthDateMillis: 631152000000,
 	}, nil
+}
+
+//清除图片信息
+func (s *Service) ClearProfilePhoto(c context.Context, req *rentalpb.ClearProfilePhotoRequest) (*rentalpb.ClearProfilePhotoResponse, error) {
+	aid, err := sharedauth.AccountIDFromContext(c)
+	if err != nil {
+		return nil, err
+	}
+	err = s.Mongo.UpdateProfilePhoto(c, aid, id.BlobID(""))
+	if err != nil {
+		return nil, status.Error(codes.Internal, "")
+	}
+	return &rentalpb.ClearProfilePhotoResponse{}, nil
 }
 
 func (s *Service) logAndConvertProfileErr(err error) codes.Code {

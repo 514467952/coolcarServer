@@ -121,6 +121,9 @@ message CompleteProfilePhotoResponse{
     Identity identity = 1;
 }
 
+message ClearProfilePhotoRequest {}
+message ClearProfilePhotoResponse{}
+
 service ProfileService {
     rpc GetProfile (GetProfileRequest) returns (Profile);
     rpc SubmitProfile (Identity) returns (Profile);
@@ -129,4 +132,5 @@ service ProfileService {
     rpc GetProfilePhoto (GetProfilePhotoRequest) returns (GetProfilePhotoResponse);
     rpc CreateProfilePhoto (CreateProfilePhotoRequest) returns (CreateProfilePhotoResponse);
     rpc CompleteProfilePhoto (CompleteProfilePhotoRequest) returns (CompleteProfilePhotoResponse);
+    rpc ClearProfilePhoto (ClearProfilePhotoRequest) returns (ClearProfilePhotoResponse);
 }
