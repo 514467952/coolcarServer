@@ -11,11 +11,6 @@ function genProto {
 
     protoc -I=. --go_out=plugins=grpc,paths=source_relative:$GO_OUT_PATH ./${DOMAIN}/${DOMAIN}.proto
     
-    # blob服务没有对外暴露，不提供yaml文件
-    if [ $SKIP_GETWAY ]; then
-        return
-    fi
-
     protoc -I=. --grpc-gateway_out=paths=source_relative,grpc_api_configuration=$PROTO_PATH/${DOMAIN}.yaml:$GO_OUT_PATH ./${DOMAIN}/${DOMAIN}.proto
  
     #pbjs可执行文件目录

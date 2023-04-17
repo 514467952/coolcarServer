@@ -173,6 +173,7 @@ func (s *Service) CompleteProfilePhoto(c context.Context, req *rentalpb.Complete
 
 	//制造假数据
 	s.Logger.Info("got profile photo", zap.Int("size", len(br.Data)))
+
 	return &rentalpb.Identity{
 		LicNumber:       "322152452",
 		Name:            "李四",

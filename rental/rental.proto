@@ -99,7 +99,7 @@ message Identity {
     string lic_number = 1;  //身份证码
     string name = 2;    //名字
     Gender gender = 3;   //性别
-    int64 birth_date_millis = 4; //出生日期
+    int64  birth_date_millis = 4; //出生日期
 }
 
 message GetProfileRequest {}
@@ -131,6 +131,6 @@ service ProfileService {
 
     rpc GetProfilePhoto (GetProfilePhotoRequest) returns (GetProfilePhotoResponse);
     rpc CreateProfilePhoto (CreateProfilePhotoRequest) returns (CreateProfilePhotoResponse);
-    rpc CompleteProfilePhoto (CompleteProfilePhotoRequest) returns (CompleteProfilePhotoResponse);
+    rpc CompleteProfilePhoto (CompleteProfilePhotoRequest) returns (Identity);
     rpc ClearProfilePhoto (ClearProfilePhotoRequest) returns (ClearProfilePhotoResponse);
 }

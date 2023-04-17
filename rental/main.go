@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	blobpb "coolcar/blob/api/gen/v1/blob"
 	rentalpb "coolcar/rental/api/gen/v1/rental"
 	profile "coolcar/rental/profile"
 	profiledao "coolcar/rental/profile/dao"
@@ -12,6 +13,7 @@ import (
 	tripdao "coolcar/rental/trip/dao"
 	"coolcar/shared/sharedserver"
 	"log"
+	"time"
 
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -35,9 +37,17 @@ func main() {
 
 	db := mongoClient.Database("coolcar")
 
+	//建立blob的client
+	blobConn, err := grpc.Dial("localhost:8083", grpc.WithInsecure())
+	if err != nil {
+		logger.Fatal("cannot connect blob service", zap.Error(err))
+	}
 	profService := &profile.Service{
-		Mongo:  profiledao.NewMongo(db),
-		Logger: logger,
+		BlobClient:        blobpb.NewBlobServiceClient(blobConn),
+		PhotoGetExpire:    5 * time.Second,
+		PhotoUploadExpire: 10 * time.Second,
+		Mongo:             profiledao.NewMongo(db),
+		Logger:            logger,
 	}
 
 	err = sharedserver.RunGRPCServer(&sharedserver.GRPCConfig{
